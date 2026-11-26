@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murajaah Al-Qur'an</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1e7; --paper:#fffdf8; --ink:#1f2a24; --muted:#6b7a70;
+    --green:#0f5c45; --green-2:#147a5c; --green-soft:#e3f1ea;
+    --gold:#b8892f; --gold-soft:#f5ead2; --red:#c0392b; --red-soft:#fbe4e1;
+    --line:#e7dfcd; --shadow:0 10px 30px rgba(31,42,36,.08);
+    --arab:'Amiri Quran','Amiri','Scheherazade New','Traditional Arabic',serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1714; --paper:#16211c; --ink:#ecf2ee; --muted:#93a59b;
+      --green:#3fbf8f; --green-2:#5ad1a3; --green-soft:#183a2e;
+      --gold:#e0b75e; --gold-soft:#3a3120; --red:#ff7a6b; --red-soft:#3d1f1c;
+      --line:#26352e; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0; font-family:'Plus Jakarta Sans',system-ui,sans-serif; color:var(--ink); background:var(--bg);
+    background-image:radial-gradient(circle at 20% 0%, var(--gold-soft) 0, transparent 40%),
+                     radial-gradient(circle at 100% 100%, var(--green-soft) 0, transparent 45%);
+    min-height:100vh;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 48px}
+
+  header{text-align:center;margin-bottom:10px}
+  .brand{font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .surah-btn{border:0;background:transparent;cursor:pointer;color:inherit;padding:4px 12px;border-radius:16px;transition:.2s}
+  .surah-btn:hover{background:var(--gold-soft)}
+  .surah-name{font-family:var(--arab);font-size:44px;color:var(--green);line-height:1.6}
+  .surah-sub{color:var(--muted);font-size:14px;margin-top:-4px;display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .surah-sub .caret{font-size:11px;background:var(--green);color:#fff;border-radius:99px;padding:2px 8px}
+  .basmalah{font-family:var(--arab);font-size:28px;color:var(--gold);margin-top:6px;line-height:1.8}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0}
+  .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+  .seg button{border:0;background:transparent;color:var(--muted);font:600 13px 'Plus Jakarta Sans',sans-serif;padding:8px 13px;border-radius:999px;cursor:pointer;transition:.2s}
+  .seg button.active{background:var(--green);color:#fff}
+
+  .chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 18px;padding:4px}
+  .chips.scroll{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:thin;padding:6px 4px 10px;scroll-behavior:smooth}
+  .chip{width:40px;height:40px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);
+    font-family:var(--arab);font-size:18px;color:var(--muted);cursor:pointer;display:grid;place-items:center;transition:.2s;padding:0}
+  .chip.current{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 4px var(--gold-soft)}
+  .chip.done{background:var(--green);border-color:var(--green);color:#fff}
+
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px 18px;position:relative;overflow:hidden;min-height:260px}
+  .card::before{content:"";position:absolute;inset:8px;border:1px solid var(--gold-soft);border-radius:18px;pointer-events:none}
+  .card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;position:relative;flex-wrap:wrap}
+  .ayah-label{font-weight:700;font-size:14px;color:var(--green)}
+  .ayah-label small{font-weight:600;color:var(--gold);margin-left:4px}
+  .stats{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+  .stats b{color:var(--ink)}
+  .progress{height:6px;background:var(--green-soft);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+  .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .35s ease}
+
+  .ctx{direction:rtl;text-align:center;font-family:var(--arab);font-size:24px;line-height:2;color:var(--muted);padding:10px 8px 0;opacity:.85}
+  .part-badge{display:inline-block;font:600 11px 'Plus Jakarta Sans',sans-serif;background:var(--gold-soft);color:var(--gold);border-radius:99px;padding:3px 10px;margin:8px auto 0}
+  .part-wrap{text-align:center}
+  .slots{direction:rtl;display:flex;flex-wrap:wrap;gap:10px 8px;justify-content:center;align-items:center;min-height:130px;padding:18px 6px}
+  .slot{min-width:74px;min-height:68px;padding:2px 12px;border-radius:14px;border:2px dashed var(--line);
+    display:flex;align-items:center;justify-content:center;font-family:var(--arab);font-size:30px;line-height:1.9;
+    transition:.2s;color:var(--ink)}
+  .slot.next{border-color:var(--gold);background:var(--gold-soft);animation:breathe 1.6s infinite}
+  .slot.filled{border-style:solid;border-color:var(--green-2);background:var(--green-soft)}
+  .mode-end .slot.filled{cursor:pointer;border-color:var(--gold);background:var(--gold-soft)}
+  .slot.ok{border-color:var(--green)!important;background:var(--green-soft)!important}
+  .slot.bad{border-color:var(--red)!important;background:var(--red-soft)!important;color:var(--red)}
+  .ayah-end{font-family:var(--arab);font-size:28px;color:var(--gold);padding:0 4px}
+  .more{font-size:26px;color:var(--muted);padding:0 6px}
+
+  .divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:6px 0 12px}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .bank{direction:rtl;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:80px}
+  .tile{font-family:var(--arab);font-size:30px;line-height:1.9;padding:2px 16px;border-radius:14px;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;
+    box-shadow:0 3px 0 var(--line);transition:transform .15s, opacity .2s, box-shadow .15s;user-select:none}
+  .tile:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .tile:active{transform:translateY(1px);box-shadow:0 1px 0 var(--line)}
+  .tile.used{opacity:0;pointer-events:none;transform:scale(.8)}
+  .tile.wrong{animation:shake .4s;border-color:var(--red);background:var(--red-soft);color:var(--red)}
+  .tile.hint{animation:pulse 1s 2;border-color:var(--gold);box-shadow:0 0 0 4px var(--gold-soft)}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+  .btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);font:600 14px 'Plus Jakarta Sans',sans-serif;
+    padding:11px 18px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+  .btn:hover{border-color:var(--gold)}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.primary:hover{background:var(--green-2)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .hidden{display:none!important}
+
+  .peek{position:absolute;inset:0;background:var(--paper);display:flex;align-items:center;justify-content:center;
+    direction:rtl;font-family:var(--arab);font-size:28px;line-height:2.1;text-align:center;padding:20px;color:var(--green);
+    opacity:0;pointer-events:none;transition:opacity .25s;overflow:auto}
+  .peek.show{opacity:1;pointer-events:auto}
+
+  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:220px;color:var(--muted);text-align:center;font-size:14px}
+  .spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--green-soft);border-top-color:var(--green);animation:spin .8s linear infinite}
+
+  .success{text-align:center;padding:4px 0 0}
+  .success .full{direction:rtl;font-family:var(--arab);font-size:30px;line-height:2.1;color:var(--green);margin:6px 0}
+  .success .msg{font-weight:700;color:var(--gold)}
+  .stars{font-size:26px;letter-spacing:4px;color:var(--gold)}
+
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:10}
+  .modal .box{background:var(--paper);border-radius:24px;padding:28px 22px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow)}
+  .modal h2{margin:6px 0;color:var(--green)}
+  .modal .big{font-family:var(--arab);font-size:36px;color:var(--gold);line-height:1.8}
+  .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+  .summary div{background:var(--bg);border-radius:14px;padding:12px 6px;font-size:12px;color:var(--muted)}
+  .summary b{display:block;font-size:22px;color:var(--ink)}
+  .modal .btns{display:flex;flex-direction:column;gap:8px}
+  .modal .btns .btn{justify-content:center}
+
+  /* Picker */
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+  .sheet .panel{background:var(--paper);width:100%;max-width:820px;max-height:90vh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;animation:up .25s ease}
+  .sheet .top{padding:18px 18px 10px;border-bottom:1px solid var(--line)}
+  .sheet .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .sheet h3{margin:0;color:var(--green);font-size:18px}
+  .close{border:0;background:var(--bg);color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:16px}
+  .filters{display:flex;gap:8px}
+  .search,.juz-select{padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 14px 'Plus Jakarta Sans',sans-serif;outline:none}
+  .search{flex:1;min-width:0}
+  .juz-select{flex:none;width:118px;cursor:pointer}
+  .search:focus,.juz-select:focus{border-color:var(--gold)}
+  .dl{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}
+  .dl .btn{padding:7px 12px;font-size:12px;flex:none}
+  .list{overflow:auto;padding:10px 12px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--paper);cursor:pointer;text-align:left;color:var(--ink);transition:.15s;font-family:inherit}
+  .item:hover{border-color:var(--gold)}
+  .item.active{border-color:var(--green);background:var(--green-soft)}
+  .num{width:36px;height:36px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--green);
+    background:var(--gold-soft);border-radius:10px;transform:rotate(45deg)}
+  .num span{transform:rotate(-45deg)}
+  .item .info{flex:1;min-width:0}
+  .item .lat{font-weight:600;font-size:14px}
+  .item .meta{font-size:11px;color:var(--muted)}
+  .item .from{font-size:11px;color:var(--gold);font-weight:600}
+  .item .mini{height:4px;background:var(--line);border-radius:9px;margin-top:5px;overflow:hidden}
+  .item .mini div{height:100%;background:var(--green)}
+  .item .ar{font-family:var(--arab);font-size:22px;color:var(--green);line-height:1.6}
+  .item.complete .num{background:var(--green);color:#fff}
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 0;font-size:14px}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;line-height:1.7}
+
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  @keyframes breathe{50%{box-shadow:0 0 0 5px var(--gold-soft)}}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .pop{animation:pop .25s ease}
+
+  @media (max-width:520px){
+    .surah-name{font-size:38px}
+    .basmalah{font-size:24px}
+    .slot{min-width:56px;min-height:58px;font-size:25px;padding:0 9px}
+    .tile{font-size:25px;padding:0 12px}
+    .ctx{font-size:21px}
+    .success .full,.peek{font-size:24px}
+    .btn{padding:10px 13px;font-size:13px}
+    .seg button{padding:7px 10px;font-size:12px}
+    .juz-select{width:104px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Murajaah Al-Qur'an</div>
+    <button class="surah-btn" id="openPicker" aria-label="Pilih surah">
+      <div class="surah-name" id="surahArabic">الفاتحة</div>
+      <div class="surah-sub"><span id="surahLatin">1. Al-Fātiḥah · 7 ayat</span><span class="caret">Ganti ▾</span></div>
+    </button>
+    <div class="basmalah hidden" id="basmalah"></div>
+  </header>
+
+  <div class="toolbar">
+    <div class="seg" id="modeSeg">
+      <button data-mode="instant" class="active">Cek Langsung</button>
+      <button data-mode="end">Cek di Akhir</button>
+    </div>
+    <div class="seg" id="levelSeg">
+      <button data-level="easy" class="active">Mudah</button>
+      <button data-level="hard">Sulit</button>
+    </div>
+    <div class="seg" id="rasmSeg">
+      <button data-rasm="uthmani" class="active">Utsmani</button>
+      <button data-rasm="imlai">Imla'i</button>
+    </div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="card" id="card">
+    <div class="state hidden" id="loading"><div class="spinner"></div>Memuat ayat…</div>
+    <div class="state hidden" id="error">
+      <div style="font-size:28px">📡</div>
+      <div>Gagal memuat surah. Periksa koneksi internet,<br>atau buka file ini lewat Chrome.</div>
+      <button class="btn primary" id="retryBtn">Coba Lagi</button>
+    </div>
+
+    <div id="game">
+      <div class="card-head">
+        <div class="ayah-label" id="ayahLabel">Ayat 1</div>
+        <div class="stats">
+          <span>Salah: <b id="mistakes">0</b></span>
+          <span>Bantuan: <b id="hints">0</b></span>
+        </div>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+
+      <div id="playArea">
+        <div class="ctx hidden" id="ctx"></div>
+        <div class="part-wrap hidden" id="partWrap"><span class="part-badge" id="partBadge"></span></div>
+        <div class="slots" id="slots"></div>
+        <div class="divider">pilih kata secara berurutan</div>
+        <div class="bank" id="bank"></div>
+      </div>
+
+      <div class="success hidden" id="success">
+        <div class="stars" id="stars">★★★</div>
+        <div class="full" id="fullAyah"></div>
+        <div class="msg" id="successMsg"></div>
+      </div>
+    </div>
+
+    <div class="peek" id="peek"></div>
+  </div>
+
+  <div class="actions" id="actions">
+    <button class="btn" id="prevBtn">→ Sebelumnya</button>
+    <button class="btn" id="hintBtn">💡 Petunjuk</button>
+    <button class="btn" id="peekBtn">👁 Intip</button>
+    <button class="btn" id="resetBtn">↺ Ulang</button>
+    <button class="btn primary hidden" id="checkBtn">✓ Periksa</button>
+    <button class="btn primary" id="nextBtn">Berikutnya ←</button>
+  </div>
+
+  <footer>
+    Ketuk kata di bawah sesuai urutan ayat. Ayat panjang dibagi menjadi beberapa bagian.<br>
+    Mode <b>Cek di Akhir</b>: ketuk kata di baris atas untuk mengembalikannya.<br>
+    Teks Al-Qur'an: Tanzil (via alquran.cloud) / Quran.com · tersimpan di perangkat setelah dimuat.
+  </footer>
+</div>
+
+<!-- Finish modal -->
+<div class="modal hidden" id="modal">
+  <div class="box">
+    <div class="big">مَا شَاءَ اللَّهُ</div>
+    <h2 id="finishTitle">Surah Selesai!</h2>
+    <div style="color:var(--muted);font-size:14px">Semoga Allah menjaga hafalanmu.</div>
+    <div class="summary">
+      <div><b id="sumAyah">0</b>Ayat</div>
+      <div><b id="sumMistake">0</b>Salah</div>
+      <div><b id="sumHint">0</b>Bantuan</div>
+    </div>
+    <div class="btns">
+      <button class="btn primary" id="nextSurahBtn">Lanjut Surah Berikutnya</button>
+      <button class="btn" id="restartBtn">Ulangi Surah Ini</button>
+    </div>
+  </div>
+</div>
+
+<!-- Surah picker -->
+<div class="sheet hidden" id="picker">
+  <div class="panel">
+    <div class="top">
+      <div class="top-row"><h3>Pilih Surah</h3><button class="close" id="closePicker">✕</button></div>
+      <div class="filters">
+        <input class="search" id="search" placeholder="Cari nama / nomor surah…">
+        <select class="juz-select" id="juzSelect"></select>
+      </div>
+      <div class="dl"><span id="dlStatus">Simpan seluruh Al-Qur'an agar bisa dipakai offline.</span><button class="btn" id="dlBtn">⬇ Simpan Offline</button></div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+</div>
+
+<script>
+/* ====== DAFTAR 114 SURAH: [nomor, nama latin, nama arab, jumlah ayat] ====== */
+const META = [
+  [1,"Al-Fātiḥah","الفاتحة",7],[2,"Al-Baqarah","البقرة",286],[3,"Āli 'Imrān","آل عمران",200],
+  [4,"An-Nisā'","النساء",176],[5,"Al-Mā'idah","المائدة",120],[6,"Al-An'ām","الأنعام",165],
+  [7,"Al-A'rāf","الأعراف",206],[8,"Al-Anfāl","الأنفال",75],[9,"At-Taubah","التوبة",129],
+  [10,"Yūnus","يونس",109],[11,"Hūd","هود",123],[12,"Yūsuf","يوسف",111],
+  [13,"Ar-Ra'd","الرعد",43],[14,"Ibrāhīm","إبراهيم",52],[15,"Al-Ḥijr","الحجر",99],
+  [16,"An-Naḥl","النحل",128],[17,"Al-Isrā'","الإسراء",111],[18,"Al-Kahf","الكهف",110],
+  [19,"Maryam","مريم",98],[20,"Ṭāhā","طه",135],[21,"Al-Anbiyā'","الأنبياء",112],
+  [22,"Al-Ḥajj","الحج",78],[23,"Al-Mu'minūn","المؤمنون",118],[24,"An-Nūr","النور",64],
+  [25,"Al-Furqān","الفرقان",77],[26,"Asy-Syu'arā'","الشعراء",227],[27,"An-Naml","النمل",93],
+  [28,"Al-Qaṣaṣ","القصص",88],[29,"Al-'Ankabūt","العنكبوت",69],[30,"Ar-Rūm","الروم",60],
+  [31,"Luqmān","لقمان",34],[32,"As-Sajdah","السجدة",30],[33,"Al-Aḥzāb","الأحزاب",73],
+  [34,"Saba'","سبأ",54],[35,"Fāṭir","فاطر",45],[36,"Yāsīn","يس",83],
+  [37,"Aṣ-Ṣāffāt","الصافات",182],[38,"Ṣād","ص",88],[39,"Az-Zumar","الزمر",75],
+  [40,"Gāfir","غافر",85],[41,"Fuṣṣilat","فصلت",54],[42,"Asy-Syūrā","الشورى",53],
+  [43,"Az-Zukhruf","الزخرف",89],[44,"Ad-Dukhān","الدخان",59],[45,"Al-Jāṡiyah","الجاثية",37],
+  [46,"Al-Aḥqāf","الأحقاف",35],[47,"Muḥammad","محمد",38],[48,"Al-Fatḥ","الفتح",29],
+  [49,"Al-Ḥujurāt","الحجرات",18],[50,"Qāf","ق",45],[51,"Aż-Żāriyāt","الذاريات",60],
+  [52,"Aṭ-Ṭūr","الطور",49],[53,"An-Najm","النجم",62],[54,"Al-Qamar","القمر",55],
+  [55,"Ar-Raḥmān","الرحمن",78],[56,"Al-Wāqi'ah","الواقعة",96],[57,"Al-Ḥadīd","الحديد",29],
+  [58,"Al-Mujādilah","المجادلة",22],[59,"Al-Ḥasyr","الحشر",24],[60,"Al-Mumtaḥanah","الممتحنة",13],
+  [61,"Aṣ-Ṣaff","الصف",14],[62,"Al-Jumu'ah","الجمعة",11],[63,"Al-Munāfiqūn","المنافقون",11],
+  [64,"At-Tagābun","التغابن",18],[65,"Aṭ-Ṭalāq","الطلاق",12],[66,"At-Taḥrīm","التحريم",12],
+  [67,"Al-Mulk","الملك",30],[68,"Al-Qalam","القلم",52],[69,"Al-Ḥāqqah","الحاقة",52],
+  [70,"Al-Ma'ārij","المعارج",44],[71,"Nūḥ","نوح",28],[72,"Al-Jinn","الجن",28],
+  [73,"Al-Muzzammil","المزمل",20],[74,"Al-Muddaṡṡir","المدثر",56],[75,"Al-Qiyāmah","القيامة",40],
+  [76,"Al-Insān","الإنسان",31],[77,"Al-Mursalāt","المرسلات",50],
+  [78,"An-Naba'","النبأ",40],[79,"An-Nāzi'āt","النازعات",46],[80,"'Abasa","عبس",42],
+  [81,"At-Takwīr","التكوير",29],[82,"Al-Infiṭār","الانفطار",19],[83,"Al-Muṭaffifīn","المطففين",36],
+  [84,"Al-Insyiqāq","الانشقاق",25],[85,"Al-Burūj","البروج",22],[86,"Aṭ-Ṭāriq","الطارق",17],
+  [87,"Al-A'lā","الأعلى",19],[88,"Al-Gāsyiyah","الغاشية",26],[89,"Al-Fajr","الفجر",30],
+  [90,"Al-Balad","البلد",20],[91,"Asy-Syams","الشمس",15],[92,"Al-Lail","الليل",21],
+  [93,"Aḍ-Ḍuḥā","الضحى",11],[94,"Asy-Syarḥ","الشرح",8],[95,"At-Tīn","التين",8],
+  [96,"Al-'Alaq","العلق",19],[97,"Al-Qadr","القدر",5],[98,"Al-Bayyinah","البينة",8],
+  [99,"Az-Zalzalah","الزلزلة",8],[100,"Al-'Ādiyāt","العاديات",11],[101,"Al-Qāri'ah","القارعة",11],
+  [102,"At-Takāṡur","التكاثر",8],[103,"Al-'Aṣr","العصر",3],[104,"Al-Humazah","الهمزة",9],
+  [105,"Al-Fīl","الفيل",5],[106,"Quraisy","قريش",4],[107,"Al-Mā'ūn","الماعون",7],
+  [108,"Al-Kauṡar","الكوثر",3],[109,"Al-Kāfirūn","الكافرون",6],[110,"An-Naṣr","النصر",3],
+  [111,"Al-Lahab","المسد",5],[112,"Al-Ikhlāṣ","الإخلاص",4],[113,"Al-Falaq","الفلق",5],
+  [114,"An-Nās","الناس",6]
+];
+const metaOf = no => META[no - 1];
+
+/* Awal tiap juz: [surah, ayat] */
+const JUZ = [[1,1],[2,142],[2,253],[3,93],[4,24],[4,148],[5,82],[6,111],[7,88],[8,41],
+  [9,93],[11,6],[12,53],[15,1],[17,1],[18,75],[21,1],[23,1],[25,21],[27,56],
+  [29,46],[33,31],[36,28],[39,32],[41,47],[46,1],[51,31],[58,1],[67,1],[78,1]];
+function juzOf(s, a){
+  let j = 1;
+  for (let i = 0; i < JUZ.length; i++) {
+    const [js, ja] = JUZ[i];
+    if (s > js || (s === js && a >= ja)) j = i + 1; else break;
+  }
+  return j;
+}
+function surahsInJuz(j){
+  const [s1, a1] = JUZ[j - 1];
+  const next = JUZ[j];
+  const out = [];
+  const last = next ? (next[1] === 1 ? next[0] - 1 : next[0]) : 114;
+  for (let s = s1; s <= last; s++) out.push({ no: s, start: s === s1 ? a1 : 1 });
+  return out;
+}
+
+/* Cadangan offline Al-Fatihah */
+const FATIHAH = [
+  "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ","الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ","الرَّحْمَٰنِ الرَّحِيمِ",
+  "مَالِكِ يَوْمِ الدِّينِ","إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ","اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+  "صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"
+];
+const BASMALAH = { uthmani:"بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", imlai:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ" };
+const MAX_WORDS = 10; // ayat lebih panjang dibagi per bagian
+
+/* ====== PENYIMPANAN ====== */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+
+/* ====== STATE ====== */
+const S = {
+  surahNo: 1, ayah: 0, mode:"instant", level:"easy", rasm:"uthmani",
+  ayat: [], words: [], parts: [], part: 0, tiles: [], placed: [],
+  ayahMistakes:0, ayahHints:0, surahMistakes:0, surahHints:0,
+  done: new Set(), solved:false, loading:false
+};
+const $ = id => document.getElementById(id);
+const toArabicNum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ====== PENGOLAHAN TEKS ====== */
+const HAS_LETTER = /[ء-يٱ-ۓۺ-ۼ]/;
+const normalize = w => w.replace(/[ً-ٰٟۖ-ۭـ﻿]/g,"").replace(/[ٱأإآ]/g,"ا");
+
+function tokenize(text){
+  const raw = text.replace(/﻿/g,"").trim().split(/\s+/);
+  const out = []; let carry = "";
+  raw.forEach(t => {
+    if (!HAS_LETTER.test(t)) {
+      if (out.length) out[out.length - 1] += " " + t; // tanda waqaf/sajdah ikut kata sebelumnya
+      else carry += t + " ";                           // tanda ۞ di awal ikut kata berikutnya
+    } else { out.push(carry + t); carry = ""; }
+  });
+  return out;
+}
+function processAyat(no, texts){
+  return texts.map((t, i) => {
+    let words = tokenize(t);
+    if (i === 0 && no !== 1 && no !== 9 && words.length > 4) {
+      const head = words.slice(0, 4).map(normalize).join(" ").replace(/[۞\s]+/g," ").trim();
+      if (head === "بسم الله الرحمن الرحيم") words = words.slice(4);
+    }
+    return words;
+  });
+}
+function splitParts(n){
+  const k = Math.ceil(n / MAX_WORDS), size = Math.ceil(n / k), parts = [];
+  for (let s = 0; s < n; s += size) parts.push([s, Math.min(n, s + size)]);
+  return parts;
+}
+
+/* ====== AMBIL TEKS ====== */
+async function fetchJSON(url){
+  const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 15000);
+  try { const r = await fetch(url, { signal: ctrl.signal }); if (!r.ok) throw new Error(r.status); return await r.json(); }
+  finally { clearTimeout(to); }
+}
+async function getSurahTexts(no, rasm){
+  const key = `q_${rasm}_${no}`;
+  const cached = store.get(key, null);
+  if (cached && cached.length === metaOf(no)[3]) return cached;
+
+  let texts = null;
+  try {
+    const ed = rasm === "uthmani" ? "quran-uthmani" : "quran-simple";
+    const j = await fetchJSON(`https://api.alquran.cloud/v1/surah/${no}/${ed}`);
+    texts = j.data.ayahs.map(a => a.text);
+  } catch(e) {
+    try {
+      const f = rasm === "uthmani" ? "uthmani" : "imlaei";
+      const j = await fetchJSON(`https://api.quran.com/api/v4/quran/verses/${f}?chapter_number=${no}`);
+      texts = j.verses.map(v => v[`text_${f}`]);
+    } catch(e2) { texts = null; }
+  }
+  if ((!texts || texts.length !== 7) && no === 1) return FATIHAH;
+  if (!texts || texts.length !== metaOf(no)[3]) throw new Error("fetch failed");
+  store.set(key, texts);
+  return texts;
+}
+
+/* ====== MUAT SURAH ====== */
+async function loadSurah(no, startAyah){
+  S.surahNo = no; S.loading = true;
+  store.set("lastSurah", no);
+  S.done = new Set(store.get(`done_${no}`, []));
+  S.surahMistakes = 0; S.surahHints = 0;
+  renderHeader();
+  showState("loading");
+  try {
+    const texts = await getSurahTexts(no, S.rasm);
+    if (S.surahNo !== no) return;
+    S.ayat = processAyat(no, texts);
+    S.loading = false;
+    showState("game");
+    if (startAyah !== undefined) S.ayah = Math.min(Math.max(0, startAyah), S.ayat.length - 1);
+    else {
+      const saved = store.get(`pos_${no}`, null);
+      const firstUndone = S.ayat.findIndex((_, i) => !S.done.has(i));
+      S.ayah = saved !== null && saved < S.ayat.length ? saved : (firstUndone === -1 ? 0 : firstUndone);
+    }
+    setupAyah();
+  } catch(e) {
+    S.loading = false;
+    showState("error");
+  }
+}
+function showState(which){
+  $("loading").classList.toggle("hidden", which !== "loading");
+  $("error").classList.toggle("hidden", which !== "error");
+  $("game").classList.toggle("hidden", which !== "game");
+  $("actions").style.visibility = which === "game" ? "visible" : "hidden";
+  if (which !== "game") $("chips").innerHTML = "";
+}
+function renderHeader(){
+  const m = metaOf(S.surahNo);
+  const j1 = juzOf(m[0], 1), j2 = juzOf(m[0], m[3]);
+  $("surahArabic").textContent = m[2];
+  $("surahLatin").textContent = `${m[0]}. ${m[1]} · ${m[3]} ayat · Juz ${j1 === j2 ? j1 : j1 + "–" + j2}`;
+  const showB = S.surahNo !== 1 && S.surahNo !== 9;
+  $("basmalah").classList.toggle("hidden", !showB);
+  $("basmalah").textContent = BASMALAH[S.rasm];
+}
+
+/* ====== SETUP AYAT & BAGIAN ====== */
+function setupAyah(){
+  S.words = S.ayat[S.ayah];
+  S.parts = splitParts(S.words.length);
+  S.part = 0;
+  S.ayahMistakes = 0; S.ayahHints = 0; S.solved = false;
+  store.set(`pos_${S.surahNo}`, S.ayah);
+  setupPart();
+}
+function curWords(){ const [a, b] = S.parts[S.part]; return S.words.slice(a, b); }
+function setupPart(){
+  const words = curWords();
+  let pool = words.slice();
+  if (S.level === "hard") {
+    const others = [...new Set(S.ayat.flat())].filter(w => !words.includes(w));
+    pool = pool.concat(shuffle(others).slice(0, Math.min(3, others.length)));
+  }
+  let order = shuffle(pool), tries = 0;
+  while (order.length > 1 && order.join(" ") === pool.join(" ") && tries++ < 10) order = shuffle(pool);
+  S.tiles = order.map((text, id) => ({ id, text, used:false }));
+  S.placed = [];
+  render();
+}
+
+/* ====== RENDER ====== */
+function render(){
+  const total = S.ayat.length;
+  const words = curWords();
+  const [pStart, pEnd] = S.parts[S.part];
+  const multi = S.parts.length > 1;
+
+  $("ayahLabel").innerHTML = `Ayat ${S.ayah + 1} dari ${total}<small>· Juz ${juzOf(S.surahNo, S.ayah + 1)}</small>`;
+  $("mistakes").textContent = S.ayahMistakes;
+  $("hints").textContent = S.ayahHints;
+  $("card").classList.toggle("mode-end", S.mode === "end");
+  ["mode","level","rasm"].forEach(k => document.querySelectorAll(`#${k}Seg button`).forEach(b => b.classList.toggle("active", b.dataset[k] === S[k])));
+
+  // navigasi ayat
+  const chips = $("chips"); chips.innerHTML = "";
+  chips.classList.toggle("scroll", total > 20);
+  let cur = null;
+  S.ayat.forEach((_, i) => {
+    const c = document.createElement("button");
+    c.className = "chip" + (S.done.has(i) ? " done" : "") + (i === S.ayah ? " current" : "");
+    c.textContent = toArabicNum(i + 1);
+    c.onclick = () => { S.ayah = i; setupAyah(); };
+    chips.appendChild(c);
+    if (i === S.ayah) cur = c;
+  });
+  if (cur && total > 20) requestAnimationFrame(() => { chips.scrollLeft = cur.offsetLeft - chips.clientWidth / 2 + cur.offsetWidth / 2; });
+
+  // konteks & bagian
+  $("ctx").classList.toggle("hidden", pStart === 0);
+  $("ctx").textContent = S.words.slice(0, pStart).join(" ");
+  $("partWrap").classList.toggle("hidden", !multi);
+  $("partBadge").textContent = `Bagian ${S.part + 1} dari ${S.parts.length}`;
+
+  const slots = $("slots"); slots.innerHTML = "";
+  words.forEach((_, i) => {
+    const s = document.createElement("div"); s.className = "slot";
+    const tid = S.placed[i];
+    if (tid !== undefined) {
+      s.classList.add("filled"); s.textContent = S.tiles[tid].text;
+      if (S.mode === "end") s.onclick = () => removeAt(i);
+    } else if (i === S.placed.length) s.classList.add("next");
+    slots.appendChild(s);
+  });
+  const end = document.createElement("div");
+  if (pEnd < S.words.length) { end.className = "more"; end.textContent = "…"; }
+  else { end.className = "ayah-end"; end.textContent = `﴿${toArabicNum(S.ayah + 1)}﴾`; }
+  slots.appendChild(end);
+
+  const bank = $("bank"); bank.innerHTML = "";
+  S.tiles.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "tile" + (t.used ? " used" : "");
+    b.textContent = t.text; b.dataset.id = t.id;
+    b.onclick = () => pick(t.id, b);
+    bank.appendChild(b);
+  });
+
+  $("bar").style.width = ((S.solved ? S.words.length : pStart + S.placed.length) / S.words.length * 100) + "%";
+  $("prevBtn").disabled = S.ayah === 0;
+  $("checkBtn").classList.toggle("hidden", S.mode !== "end" || S.solved);
+  $("checkBtn").disabled = S.placed.length < words.length;
+  $("hintBtn").disabled = $("peekBtn").disabled = S.solved;
+  $("playArea").classList.toggle("hidden", S.solved);
+  $("success").classList.toggle("hidden", !S.solved);
+  $("nextBtn").textContent = S.ayah === total - 1 ? "Selesai ✓" : "Berikutnya ←";
+}
+
+/* ====== AKSI ====== */
+const ayahText = i => S.ayat[i].join(" ") + ` ﴿${toArabicNum(i + 1)}﴾`;
+function addMistake(){ S.ayahMistakes++; S.surahMistakes++; $("mistakes").textContent = S.ayahMistakes; }
+function addHint(){ S.ayahHints++; S.surahHints++; $("hints").textContent = S.ayahHints; }
+
+function partDone(){
+  if (S.part < S.parts.length - 1) { S.part++; setupPart(); }
+  else solve();
+}
+function pick(id, el){
+  if (S.solved) return;
+  const words = curWords();
+  const tile = S.tiles[id];
+  if (tile.used || S.placed.length >= words.length) return;
+  if (S.mode === "instant" && tile.text !== words[S.placed.length]) {
+    addMistake();
+    el.classList.remove("wrong"); void el.offsetWidth; el.classList.add("wrong");
+    if (navigator.vibrate) navigator.vibrate(120);
+    return;
+  }
+  tile.used = true; S.placed.push(id);
+  render();
+  const last = $("slots").children[S.placed.length - 1];
+  if (last) last.classList.add("pop");
+  if (S.mode === "instant" && S.placed.length === words.length) setTimeout(partDone, 350);
+}
+function removeAt(i){
+  if (S.solved) return;
+  S.tiles[S.placed.splice(i, 1)[0]].used = false;
+  render();
+}
+function check(){
+  const words = curWords();
+  const els = $("slots").querySelectorAll(".slot");
+  let allOk = true;
+  words.forEach((w, i) => { const ok = S.tiles[S.placed[i]].text === w; els[i].classList.add(ok ? "ok" : "bad"); if (!ok) allOk = false; });
+  if (allOk) setTimeout(partDone, 500);
+  else { addMistake(); if (navigator.vibrate) navigator.vibrate([80, 60, 80]); }
+}
+function hint(){
+  if (S.solved) return;
+  const words = curWords();
+  let i = 0;
+  while (i < S.placed.length && S.tiles[S.placed[i]].text === words[i]) i++;
+  if (i < S.placed.length) S.placed.splice(i).forEach(id => S.tiles[id].used = false);
+  if (i >= words.length) return;
+  addHint(); render();
+  const t = S.tiles.find(t => !t.used && t.text === words[i]);
+  const el = t && $("bank").querySelector(`[data-id="${t.id}"]`);
+  if (el) { el.classList.add("hint"); setTimeout(() => el.classList.remove("hint"), 2000); }
+}
+let peekTimer = null;
+function hidePeek(){ $("peek").classList.remove("show"); clearTimeout(peekTimer); }
+function peek(){
+  if (S.solved) return;
+  addHint();
+  const p = $("peek"); p.textContent = ayahText(S.ayah); p.classList.add("show");
+  clearTimeout(peekTimer);
+  peekTimer = setTimeout(hidePeek, Math.min(6000, 2000 + S.words.length * 120));
+}
+function solve(){
+  S.solved = true; S.done.add(S.ayah);
+  store.set(`done_${S.surahNo}`, [...S.done]);
+  const pen = S.ayahMistakes + S.ayahHints;
+  const stars = pen === 0 ? 3 : pen <= 2 ? 2 : 1;
+  $("stars").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
+  $("fullAyah").textContent = ayahText(S.ayah);
+  $("successMsg").textContent = stars === 3 ? "مَا شَاءَ اللَّهُ · Sempurna!" : stars === 2 ? "بَارَكَ اللَّهُ فِيكَ · Bagus!" : "Terus berlatih, insyaAllah lancar!";
+  render();
+}
+function next(){
+  const total = S.ayat.length;
+  if (S.ayah < total - 1) { S.ayah++; setupAyah(); return; }
+  if (S.done.size === total) {
+    const m = metaOf(S.surahNo);
+    $("finishTitle").textContent = `${m[1]} Selesai!`;
+    $("sumAyah").textContent = total;
+    $("sumMistake").textContent = S.surahMistakes;
+    $("sumHint").textContent = S.surahHints;
+    $("nextSurahBtn").classList.toggle("hidden", S.surahNo === 114);
+    if (S.surahNo < 114) $("nextSurahBtn").textContent = `Lanjut: ${metaOf(S.surahNo + 1)[1]} ←`;
+    $("modal").classList.remove("hidden");
+  } else {
+    S.ayah = S.ayat.findIndex((_, i) => !S.done.has(i)); setupAyah();
+  }
+}
+
+/* ====== PICKER ====== */
+const juzSel = $("juzSelect");
+juzSel.innerHTML = `<option value="0">Semua Juz</option>` + JUZ.map((_, i) => `<option value="${i + 1}">Juz ${i + 1}</option>`).join("");
+
+function renderList(){
+  const q = $("search").value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ'’ʿ\-\s]/g,"");
+  const juz = +juzSel.value;
+  const entries = juz ? surahsInJuz(juz) : META.map(m => ({ no: m[0], start: 1 }));
+  const list = $("list"); list.innerHTML = "";
+  let shown = 0;
+  entries.forEach(({ no, start }) => {
+    const [, lat, ar, n] = metaOf(no);
+    const key = (no + lat).toLowerCase().normalize("NFD").replace(/[̀-ͯ'’ʿ\-\s]/g,"");
+    if (q && !key.includes(q) && !ar.includes($("search").value.trim())) return;
+    shown++;
+    const done = store.get(`done_${no}`, []).length;
+    const j1 = juzOf(no, 1), j2 = juzOf(no, n);
+    const b = document.createElement("button");
+    b.className = "item" + (no === S.surahNo ? " active" : "") + (done >= n ? " complete" : "");
+    b.innerHTML = `<div class="num"><span>${no}</span></div>
+      <div class="info"><div class="lat">${lat}</div>
+      <div class="meta">${n} ayat · Juz ${j1 === j2 ? j1 : j1 + "–" + j2} · ${done}/${n} hafal</div>
+      ${start > 1 ? `<div class="from">Juz ${juz} mulai ayat ${start}</div>` : ""}
+      <div class="mini"><div style="width:${Math.min(100, done / n * 100)}%"></div></div></div>
+      <div class="ar">${ar}</div>`;
+    b.onclick = () => { closePicker(); loadSurah(no, start > 1 ? start - 1 : (juz ? 0 : undefined)); };
+    list.appendChild(b);
+  });
+  if (!shown) list.innerHTML = `<div class="empty">Surah tidak ditemukan.</div>`;
+}
+function openPicker(){
+  $("picker").classList.remove("hidden"); $("search").value = "";
+  renderList();
+  const act = $("list").querySelector(".item.active");
+  if (act) act.scrollIntoView({ block: "center" });
+}
+function closePicker(){ $("picker").classList.add("hidden"); }
+
+let downloading = false;
+async function downloadAll(){
+  if (downloading) return;
+  downloading = true;
+  const btn = $("dlBtn"); btn.disabled = true;
+  let ok = 0, fail = 0, idx = 0;
+  const rasm = S.rasm;
+  const worker = async () => {
+    while (idx < META.length) {
+      const no = META[idx++][0];
+      try { await getSurahTexts(no, rasm); ok++; } catch(e) { fail++; }
+      $("dlStatus").textContent = `Menyimpan… ${ok + fail}/114`;
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  $("dlStatus").textContent = fail
+    ? `${ok} surah tersimpan, ${fail} gagal. Tekan lagi untuk melanjutkan.`
+    : `✓ Seluruh 114 surah (${rasm === "uthmani" ? "Utsmani" : "Imla'i"}) tersimpan offline.`;
+  btn.disabled = false; downloading = false;
+}
+
+/* ====== EVENT ====== */
+function savePrefs(){ store.set("prefs", { mode:S.mode, level:S.level, rasm:S.rasm }); }
+$("modeSeg").onclick = e => { const v = e.target.dataset.mode; if (v && v !== S.mode && !S.loading) { S.mode = v; savePrefs(); setupAyah(); } };
+$("levelSeg").onclick = e => { const v = e.target.dataset.level; if (v && v !== S.level && !S.loading) { S.level = v; savePrefs(); setupAyah(); } };
+$("rasmSeg").onclick = e => {
+  const v = e.target.dataset.rasm; if (!v || v === S.rasm || S.loading) return;
+  S.rasm = v; savePrefs();
+  document.querySelectorAll("#rasmSeg button").forEach(b => b.classList.toggle("active", b.dataset.rasm === v));
+  loadSurah(S.surahNo, S.ayah);
+};
+$("prevBtn").onclick = () => { if (S.ayah > 0) { S.ayah--; setupAyah(); } };
+$("nextBtn").onclick = next;
+$("resetBtn").onclick = () => { S.done.delete(S.ayah); store.set(`done_${S.surahNo}`, [...S.done]); setupAyah(); };
+$("hintBtn").onclick = hint;
+$("peekBtn").onclick = peek;
+$("peek").onclick = hidePeek;
+$("checkBtn").onclick = check;
+$("retryBtn").onclick = () => loadSurah(S.surahNo);
+$("openPicker").onclick = openPicker;
+$("closePicker").onclick = closePicker;
+$("picker").onclick = e => { if (e.target.id === "picker") closePicker(); };
+$("search").oninput = renderList;
+juzSel.onchange = renderList;
+$("dlBtn").onclick = downloadAll;
+$("restartBtn").onclick = () => {
+  $("modal").classList.add("hidden");
+  S.done.clear(); store.set(`done_${S.surahNo}`, []);
+  S.surahMistakes = 0; S.surahHints = 0; S.ayah = 0; setupAyah();
+};
+$("nextSurahBtn").onclick = () => {
+  $("modal").classList.add("hidden");
+  if (S.surahNo < 114) loadSurah(S.surahNo + 1, 0);
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closePicker(); hidePeek(); } });
+
+/* ====== MULAI ====== */
+const prefs = store.get("prefs", {});
+Object.assign(S, { mode: prefs.mode || "instant", level: prefs.level || "easy", rasm: prefs.rasm || "uthmani" });
+loadSurah(store.get("lastSurah", 1));
+</script>
+</body>
+</html>
