@@ -13,6 +13,7 @@
     --green:#0f5c45; --green-2:#147a5c; --green-soft:#e3f1ea;
     --gold:#b8892f; --gold-soft:#f5ead2; --red:#c0392b; --red-soft:#fbe4e1;
     --line:#e7dfcd; --veil:#ebe3d1; --shadow:0 10px 30px rgba(31,42,36,.08);
+    --blue:#2f6fb5; --blue-soft:#e3edf8;
     --arab:'Amiri Quran','Amiri','Scheherazade New','Traditional Arabic',serif;
   }
   @media (prefers-color-scheme: dark){
@@ -21,6 +22,7 @@
       --green:#3fbf8f; --green-2:#5ad1a3; --green-soft:#183a2e;
       --gold:#e0b75e; --gold-soft:#3a3120; --red:#ff7a6b; --red-soft:#3d1f1c;
       --line:#26352e; --veil:#22302a; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --blue:#7fb2ec; --blue-soft:#1d2c3d;
     }
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -113,9 +115,50 @@
   .divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:6px 0 12px}
   .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
 
-  .page-mode .dock{position:sticky;bottom:0;z-index:3;background:var(--paper);margin:0 -18px -22px;padding:8px 12px 14px;
+  /* ====== Setor suara ====== */
+  .recite-mode #ayahView,.recite-mode #chips,.recite-mode #actions,.recite-mode #bank,.recite-mode #dockLabel,.recite-mode .card-head .stats{display:none!important}
+  .recite-mode #mushaf{display:block!important}
+  .recite-panel{display:none}
+  .recite-mode .recite-panel{display:block}
+  .w{border-radius:6px;transition:color .25s, background .25s, opacity .25s}
+  .w-veil{color:transparent;background:var(--veil);user-select:none}
+  .w-next{color:transparent;background:var(--veil);box-shadow:0 0 0 2px var(--gold);animation:breathe 1.6s infinite}
+  .w-hint{color:var(--muted)!important;opacity:.6;background:var(--gold-soft)!important}
+  .w-ok{color:var(--ink)}
+  .w-tent{color:var(--green-2);opacity:.75}
+  .w-fixed{color:var(--gold);background:var(--gold-soft)}
+  .w-bad{color:var(--red);background:var(--red-soft)}
+  .w-halt{box-shadow:0 0 0 2px var(--red);animation:pulse 1s 2}
+  .w-skip{color:var(--muted);text-decoration:underline dotted var(--gold);text-decoration-thickness:2px;text-underline-offset:7px}
+  .w-help{color:var(--blue);background:var(--blue-soft)}
+  .m-num.nv{color:transparent}
+  .rp-top{display:flex;justify-content:center;margin-bottom:8px}
+  .seg.small button{padding:6px 11px;font-size:12px}
+  .rp-main{display:flex;align-items:center;justify-content:center;gap:14px}
+  .rp-main .btn{padding:9px 12px;font-size:13px}
+  .mic{width:66px;height:66px;border-radius:50%;border:0;background:var(--green);color:#fff;font-size:28px;cursor:pointer;box-shadow:0 6px 18px rgba(15,92,69,.3);transition:.2s;flex:none}
+  .mic.on{background:var(--red);box-shadow:0 0 0 0 rgba(192,57,43,.5);animation:ring 1.4s infinite}
+  .mic:disabled{opacity:.4}
+  .rp-status{text-align:center;font-size:13px;font-weight:600;color:var(--green);margin-top:8px;min-height:18px}
+  .rp-status.err{color:var(--red)}
+  .rp-heard{direction:rtl;text-align:center;font-family:var(--arab);font-size:17px;color:var(--muted);min-height:26px;line-height:1.6;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .rp-legend{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:11px;color:var(--muted);margin-top:4px}
+  .rp-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  .rp-exit{display:block;margin:8px auto 0;border:0;background:none;color:var(--muted);font:600 12px 'Plus Jakarta Sans',sans-serif;cursor:pointer;text-decoration:underline}
+  .btn.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+  .summary.five{grid-template-columns:repeat(5,1fr);gap:6px}
+  .summary.five div{font-size:10.5px;padding:10px 2px}
+  .summary.five b{font-size:20px}
+  .rm-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 16px}
+  .rm-list .lbl{width:100%;font-size:12px;color:var(--muted);margin-bottom:2px}
+  .rm-list button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:99px;padding:5px 11px;font:600 12px 'Plus Jakarta Sans',sans-serif;cursor:pointer}
+  .rm-list button:hover{border-color:var(--gold)}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(192,57,43,.45)}100%{box-shadow:0 0 0 16px rgba(192,57,43,0)}}
+
+  .page-mode .dock,.recite-mode .dock{position:sticky;bottom:0;z-index:3;background:var(--paper);margin:0 -18px -22px;padding:8px 12px 14px;
     border-top:1px solid var(--line);box-shadow:0 -10px 24px rgba(0,0,0,.06);max-height:42vh;overflow:auto;border-radius:0 0 24px 24px}
   .page-mode .dock .divider{margin:2px 0 8px}
+  .recite-mode .dock{max-height:none}
 
   .bank{direction:rtl;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:60px}
   .tile{font-family:var(--arab);font-size:30px;line-height:1.9;padding:2px 16px;border-radius:14px;
@@ -295,6 +338,29 @@
         <div class="dock" id="dock">
           <div class="divider" id="dockLabel">pilih kata secara berurutan</div>
           <div class="bank" id="bank"></div>
+          <div class="recite-panel" id="recitePanel">
+            <div class="rp-top">
+              <div class="seg small" id="stopSeg">
+                <button data-stop="1">Berhenti saat salah</button>
+                <button data-stop="0">Tandai di akhir</button>
+              </div>
+            </div>
+            <div class="rp-main">
+              <button class="btn" id="rcHelp">💡 Bantu</button>
+              <button class="mic" id="micBtn" aria-label="Mulai / jeda">🎙</button>
+              <button class="btn" id="rcDone">✓ Selesai</button>
+            </div>
+            <div class="rp-status" id="rcStatus"></div>
+            <div class="rp-heard" id="rcHeard"></div>
+            <div class="rp-legend">
+              <span><i style="background:var(--ink)"></i>benar</span>
+              <span><i style="background:var(--gold)"></i>dikoreksi</span>
+              <span><i style="background:var(--red)"></i>salah</span>
+              <span><i style="background:var(--muted)"></i>terlewat</span>
+              <span><i style="background:var(--blue)"></i>dibantu</span>
+            </div>
+            <button class="rp-exit" id="rcExit">✕ Keluar dari Setor Suara</button>
+          </div>
         </div>
       </div>
 
@@ -313,6 +379,7 @@
     <button class="btn" id="resetBtn">↺ Ulang</button>
     <button class="btn primary hidden" id="checkBtn">✓ Periksa</button>
     <button class="btn primary" id="nextBtn">Berikutnya ←</button>
+    <button class="btn gold" id="reciteBtn">🎙 Setor Suara</button>
   </div>
 
   <footer>
@@ -340,6 +407,27 @@
     <div class="btns">
       <button class="btn primary" id="nextSurahBtn">Lanjut</button>
       <button class="btn" id="restartBtn">Ulangi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Recite summary -->
+<div class="modal hidden" id="reciteModal">
+  <div class="box">
+    <div class="big" id="rmBig">مَا شَاءَ اللَّهُ</div>
+    <h2 id="rmTitle">Setoran Selesai</h2>
+    <div style="color:var(--muted);font-size:13px" id="rmSub"></div>
+    <div class="summary five">
+      <div><b id="rmOk">0</b>Benar</div>
+      <div><b id="rmFixed">0</b>Dikoreksi</div>
+      <div><b id="rmBad">0</b>Salah</div>
+      <div><b id="rmSkip">0</b>Terlewat</div>
+      <div><b id="rmHelp">0</b>Dibantu</div>
+    </div>
+    <div class="rm-list" id="rmList"></div>
+    <div class="btns">
+      <button class="btn primary" id="rmAgain">🎙 Ulangi Setoran</button>
+      <button class="btn" id="rmClose">Kembali ke Latihan Susun Kata</button>
     </div>
   </div>
 </div>
@@ -586,6 +674,7 @@ async function locatePage(s, a){
 
 /* ====== MUAT ====== */
 function beginLoad(text){
+  if (typeof R !== "undefined" && R.on) exitRecite(true);
   S.loading = true; S.solved = false;
   $("loadingText").textContent = text || "Memuat ayat…";
   showState("loading");
@@ -1045,7 +1134,7 @@ async function downloadAll(){
 }
 
 /* ====== EVENT ====== */
-function savePrefs(){ store.set("prefs", { mode:S.mode, level:S.level, rasm:S.rasm, view:S.view }); }
+function savePrefs(){ store.set("prefs", { mode:S.mode, level:S.level, rasm:S.rasm, view:S.view, stopMode: R.stopMode }); }
 $("viewSeg").onclick = e => {
   const v = e.target.dataset.view; if (!v || v === S.view) return;
   const it = S.items.length && !S.loading ? cur() : null;
@@ -1092,6 +1181,304 @@ $("nextSurahBtn").onclick = () => {
   else if (S.surahNo < 114) loadSurah(S.surahNo + 1, 0);
 };
 document.addEventListener("keydown", e => { if (e.key === "Escape") { closePicker(); hidePeek(); } });
+
+/* ====== SETOR SUARA ====== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const R = {
+  on:false, listening:false, wantListen:false, stopMode: store.get("prefs", {}).stopMode !== false,
+  seq:[], pos:0, buf:[], marks:[], hinted:new Set(), halt:null, tent:null,
+  spans:[], nums:[], rec:null, silenceT:null, startIdx:0, finalUpTo:0, lastFinal:""
+};
+/* kerangka kata: buang harakat, tanda waqaf & alif agar ejaan Utsmani/Imla'i/hasil suara bisa dibandingkan */
+const skel = w => (w || "").replace(/[ً-ٰٟۖ-ۭـ﻿]/g,"")
+  .replace(/[ٱأإآا]/g,"").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/ؤ/g,"و").replace(/ئ/g,"ي").replace(/ء/g,"")
+  .replace(/[^ء-ي]/g,"");
+function lev(a, b){
+  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(prev[j] + 1, c[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = c; }
+  return prev[n];
+}
+function sim(a, b){
+  if (!a || !b) return false; if (a === b) return true;
+  const L = Math.max(a.length, b.length);
+  return lev(a, b) <= (L <= 2 ? 0 : L <= 4 ? 1 : L <= 8 ? 2 : 3);
+}
+const loose = (a, b) => !!a && !!b && lev(a, b) <= Math.max(1, Math.round(Math.max(a.length, b.length) * 0.4));
+/* kata yang boleh diucapkan di luar teks (ta'awudz, basmalah, nama huruf muqatha'ah) */
+const IGNORE = new Set(["اعوذ","أعوذ","بالله","بسم","الله","الرحمن","الرحيم","من","الشيطان","الرجيم","صدق","العظيم",
+  "الف","لام","ميم","را","راء","كاف","ها","هاء","يا","ياء","عين","صاد","طا","طاء","سين","حا","حاء","قاف","نون"].map(skel));
+
+function buildSeq(){
+  R.seq = [];
+  S.items.forEach((it, i) => {
+    if (i < R.startIdx) return;
+    it.words.forEach((w, j) => {
+      const k = skel(w);
+      R.seq.push({ i, j, k, lenient: !k || (it.a === 1 && j === 0 && /ٓ/.test(w) && k.length <= 5) });
+    });
+  });
+}
+
+/* pencocokan kata hasil suara dengan teks mushaf */
+function runMatch(st, words, commit){
+  const seq = R.seq;
+  const ok = idx => { st.marks[idx] = R.hinted.has(idx) ? "help" : "ok"; };
+  for (const raw of words) {
+    const w = skel(raw); if (!w) continue;
+    if (st.pos >= seq.length) break;
+    if (st.halt != null) {
+      const e = seq[st.halt];
+      if (sim(w, e.k) || (w.length > 2 && loose(w, e.k))) { st.marks[st.halt] = R.hinted.has(st.halt) ? "help" : "fixed"; st.pos = st.halt + 1; st.halt = null; st.buf = []; }
+      continue;
+    }
+    const e = seq[st.pos];
+    if (sim(w, e.k)) { ok(st.pos); st.pos++; st.buf = []; continue; }
+    if (st.pos + 1 < seq.length && sim(w, e.k + seq[st.pos + 1].k)) { ok(st.pos); ok(st.pos + 1); st.pos += 2; st.buf = []; continue; }
+    if (st.buf.length && sim(st.buf[st.buf.length - 1] + w, e.k)) { ok(st.pos); st.pos++; st.buf = []; continue; }
+    if ((st.pos > 0 && sim(w, seq[st.pos - 1].k)) || (st.pos > 1 && sim(w, seq[st.pos - 2].k))) continue; // pengulangan
+    if (IGNORE.has(w)) { st.buf.push(w); continue; } // ta'awudz/basmalah/nama huruf: jangan dicocokkan ke depan
+    let found = -1;
+    for (let k = 1; k <= 6 && st.pos + k < seq.length; k++) {
+      if (sim(w, seq[st.pos + k].k) && (w.length >= 3 || k === 1)) { found = k; break; }
+    }
+    if (found > 0) {
+      const real = st.buf.filter(b => !IGNORE.has(b));
+      let firstErr = null;
+      for (let q = 0; q < found; q++) {
+        const idx = st.pos + q, ex = seq[idx];
+        if (ex.lenient) { ok(idx); continue; }
+        const b = real[q];
+        if (b && loose(b, ex.k)) ok(idx);
+        else {
+          st.marks[idx] = real.length ? "bad" : "skip";
+          if (firstErr === null && (st.marks[idx] === "bad" || found >= 2)) firstErr = idx;
+        }
+      }
+      if (commit && R.stopMode && firstErr !== null) {
+        for (let idx = firstErr + 1; idx <= st.pos + found; idx++) delete st.marks[idx];
+        st.halt = firstErr; st.pos = firstErr; st.buf = []; st.haltNew = true;
+        continue;
+      }
+      ok(st.pos + found); st.pos += found + 1; st.buf = [];
+      continue;
+    }
+    st.buf.push(w);
+    if (st.buf.filter(b => !IGNORE.has(b)).length >= 3) {
+      if (e.lenient) { ok(st.pos); st.pos++; st.buf = []; continue; }
+      st.marks[st.pos] = "bad";
+      if (commit && R.stopMode) { st.halt = st.pos; st.haltNew = true; }
+      else st.pos++;
+      st.buf = [];
+    }
+  }
+  return st;
+}
+
+function commitText(text){
+  const st = runMatch({ pos: R.pos, buf: [...R.buf], halt: R.halt, marks: {} }, text.split(/\s+/), true);
+  Object.entries(st.marks).forEach(([k, v]) => { R.marks[+k] = v; });
+  R.pos = st.pos; R.buf = st.buf; R.halt = st.halt; R.tent = null;
+  if (st.haltNew) {
+    setReciteStatus("⚠ Ada yang keliru. Ulangi dari kata yang ditandai merah.", true);
+    toast("⚠ Periksa kata yang merah");
+    if (navigator.vibrate) navigator.vibrate([90, 60, 90]);
+  } else if (R.listening && R.halt == null) setReciteStatus("Mendengarkan… lanjutkan bacaan.");
+  updateRecite();
+  if (R.pos >= R.seq.length) setTimeout(() => finishRecite(false), 700);
+}
+function previewText(text){
+  if (R.halt != null) { R.tent = null; return; }
+  const st = runMatch({ pos: R.pos, buf: [...R.buf], halt: null, marks: {} }, text.split(/\s+/), false);
+  R.tent = { pos: st.pos, marks: st.marks };
+  updateRecite();
+}
+function onSpeech(e){
+  resetSilence();
+  let interim = "";
+  for (let k = R.finalUpTo; k < e.results.length; k++) {
+    const r = e.results[k], t = r[0].transcript.trim();
+    if (r.isFinal) {
+      let add = t;
+      if (R.lastFinal && t.startsWith(R.lastFinal)) add = t.slice(R.lastFinal.length); // perangkat yang mengulang teks sebelumnya
+      R.lastFinal = t; R.finalUpTo = k + 1;
+      $("rcHeard").textContent = t;
+      if (add.trim()) commitText(add);
+    } else interim += " " + t;
+  }
+  if (interim.trim()) { $("rcHeard").textContent = interim.trim(); previewText(interim); }
+}
+function resetSilence(){
+  clearTimeout(R.silenceT);
+  if (!R.listening) return;
+  R.silenceT = setTimeout(() => {
+    if (!R.listening || R.pos >= R.seq.length) return;
+    R.hinted.add(R.halt ?? R.pos);
+    setReciteStatus("Lupa? Kata berikutnya ditampilkan samar.");
+    updateRecite();
+  }, 5000);
+}
+function setReciteStatus(msg, err){ const el = $("rcStatus"); el.textContent = msg; el.classList.toggle("err", !!err); }
+
+function startListening(){
+  if (!SR) { setReciteStatus("Browser ini belum mendukung pengenalan suara. Gunakan Google Chrome.", true); return; }
+  const rec = new SR();
+  rec.lang = "ar-SA"; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  R.finalUpTo = 0; R.lastFinal = "";
+  rec.onstart = () => { R.listening = true; updateRecitePanel(); resetSilence(); if (R.halt == null) setReciteStatus("Mendengarkan… silakan mulai membaca."); };
+  rec.onresult = onSpeech;
+  rec.onerror = e => {
+    if (e.error === "no-speech" || e.error === "aborted") return;
+    R.wantListen = false;
+    const msg = {
+      "not-allowed": "Akses mikrofon ditolak. Izinkan mikrofon untuk halaman ini. Jika tetap gagal, website perlu dibuka dari alamat https.",
+      "service-not-allowed": "Pengenalan suara tidak diizinkan di halaman ini. Coba buka dari alamat https.",
+      "network": "Pengenalan suara membutuhkan koneksi internet.",
+      "audio-capture": "Mikrofon tidak ditemukan.",
+      "language-not-supported": "Bahasa Arab tidak didukung di perangkat ini."
+    }[e.error] || ("Terjadi kesalahan: " + e.error);
+    setReciteStatus(msg, true);
+  };
+  rec.onend = () => {
+    if (R.wantListen && R.on && R.rec === rec) setTimeout(() => { if (R.wantListen && R.on && R.rec === rec) startListening(); }, 120);
+    else if (R.rec === rec) { R.listening = false; clearTimeout(R.silenceT); updateRecitePanel(); }
+  };
+  R.rec = rec; R.wantListen = true;
+  try { rec.start(); } catch(e) { setReciteStatus("Gagal memulai mikrofon. Coba lagi.", true); }
+}
+function stopListening(){
+  R.wantListen = false; R.listening = false; clearTimeout(R.silenceT);
+  const rec = R.rec; R.rec = null;
+  if (rec) { try { rec.stop(); } catch(e) {} }
+  updateRecitePanel();
+}
+function updateRecitePanel(){
+  $("micBtn").classList.toggle("on", R.listening);
+  $("micBtn").textContent = R.listening ? "■" : "🎙";
+  document.querySelectorAll("#stopSeg button").forEach(b => b.classList.toggle("active", (b.dataset.stop === "1") === R.stopMode));
+}
+
+function enterRecite(){
+  if (S.loading || !S.items.length) return;
+  hidePeek();
+  R.on = true; R.startIdx = isPage() ? 0 : S.idx;
+  buildSeq();
+  R.pos = 0; R.buf = []; R.marks = new Array(R.seq.length); R.hinted = new Set(); R.halt = null; R.tent = null;
+  document.body.classList.add("recite-mode");
+  $("dock").style.visibility = "visible";
+  $("playArea").classList.remove("hidden"); $("success").classList.add("hidden");
+  $("rcHeard").textContent = "";
+  buildReciteDom(); updateRecite(); updateRecitePanel();
+  if (SR) setReciteStatus(`Tekan 🎙 lalu baca dari ${metaOf(S.items[R.startIdx].s)[1]} ayat ${S.items[R.startIdx].a}.`);
+  else setReciteStatus("Browser ini belum mendukung pengenalan suara. Gunakan Google Chrome.", true);
+  window.scrollTo({ top: $("card").offsetTop - 10, behavior: "smooth" });
+}
+function exitRecite(silent){
+  stopListening();
+  R.on = false;
+  document.body.classList.remove("recite-mode");
+  $("reciteModal").classList.add("hidden");
+  if (!silent && S.items.length) setupAyah();
+}
+function buildReciteDom(){
+  const m = $("mushaf"); m.innerHTML = ""; R.spans = []; R.nums = [];
+  const add = (parent, tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; parent.appendChild(e); return e; };
+  S.items.forEach((it, i) => {
+    if (i < R.startIdx) return;
+    if (it.a === 1) {
+      add(m, "div", "m-surah", "سُورَةُ " + metaOf(it.s)[2]);
+      if (it.s !== 1 && it.s !== 9) add(m, "div", "m-basmalah", BASMALAH[S.rasm]);
+    }
+    const ay = add(m, "span", "m-ayah m-cur");
+    it.words.forEach(w => { R.spans.push(add(ay, "span", "w w-veil", w)); ay.append(" "); });
+    R.nums.push({ el: add(ay, "span", "m-num nv", `﴿${toArabicNum(it.a)}﴾`), last: R.spans.length - 1 });
+    m.append(" ");
+  });
+}
+function updateRecite(){
+  const cursor = R.halt ?? R.pos;
+  for (let g = 0; g < R.seq.length; g++) {
+    const st = R.marks[g];
+    let cls = "w";
+    if (g === R.halt) cls += " w-bad w-halt";
+    else if (st) cls += " w-" + st;
+    else if (R.tent && g < R.tent.pos && R.tent.marks[g] && R.tent.marks[g] !== "bad" && R.tent.marks[g] !== "skip") cls += " w-tent";
+    else if (R.hinted.has(g)) cls += " w-hint";
+    else if (g === cursor) cls += " w-next";
+    else cls += " w-veil";
+    if (R.spans[g].className !== cls) R.spans[g].className = cls;
+  }
+  R.nums.forEach(n => n.el.classList.toggle("nv", !R.marks[n.last] && !(R.tent && R.tent.marks[n.last])));
+  $("bar").style.width = (R.seq.length ? Math.min(R.pos, R.seq.length) / R.seq.length * 100 : 0) + "%";
+  const e = R.seq[Math.min(cursor, R.seq.length - 1)];
+  if (e) { const it = S.items[e.i]; $("ayahLabel").innerHTML = `🎙 Setor · ${metaOf(it.s)[1]} ayat ${it.a}<small>· ${Math.min(R.pos, R.seq.length)}/${R.seq.length} kata</small>`; }
+  followRecite();
+}
+let followT = 0;
+function followRecite(){
+  const now = Date.now(); if (now - followT < 400) return; followT = now;
+  const el = R.spans[Math.min(R.halt ?? R.pos, R.spans.length - 1)]; if (!el) return;
+  const r = el.getBoundingClientRect(), bottom = window.innerHeight - $("dock").offsetHeight - 24;
+  if (r.top < 70 || r.bottom > bottom) window.scrollBy({ top: r.top - (70 + (bottom - 70) / 3), behavior: "smooth" });
+}
+function reciteHelp(){
+  if (!R.on || R.pos >= R.seq.length) return;
+  if (R.halt != null) { R.marks[R.halt] = "help"; R.pos = R.halt + 1; R.halt = null; }
+  else { R.marks[R.pos] = "help"; R.pos++; }
+  R.buf = []; R.tent = null;
+  setReciteStatus(R.listening ? "Mendengarkan… lanjutkan bacaan." : "Tekan 🎙 untuk melanjutkan.");
+  updateRecite();
+  if (R.pos >= R.seq.length) setTimeout(() => finishRecite(false), 500);
+}
+function finishRecite(manual){
+  if (!R.on || !$("reciteModal").classList.contains("hidden")) return;
+  stopListening();
+  const n = { ok:0, fixed:0, bad:0, skip:0, help:0 };
+  const perItem = {};
+  R.seq.forEach((e, g) => {
+    const st = R.marks[g];
+    if (st) n[st]++;
+    const p = perItem[e.i] || (perItem[e.i] = { total:0, marked:0, problem:false });
+    p.total++; if (st) p.marked++;
+    if (st === "bad" || st === "skip" || st === "help") p.problem = true;
+  });
+  const problems = [];
+  Object.entries(perItem).forEach(([i, p]) => {
+    const it = S.items[+i];
+    if (p.marked === p.total) setDone(it.s, it.a, !p.problem);
+    if (p.problem) problems.push(+i);
+  });
+  const read = R.seq.filter((_, g) => R.marks[g]).length;
+  const perfect = !problems.length && !n.fixed && read === R.seq.length;
+  $("rmBig").textContent = perfect ? "مَا شَاءَ اللَّهُ" : problems.length ? "بَارَكَ اللَّهُ فِيكَ" : "أَحْسَنْتَ";
+  $("rmTitle").textContent = perfect ? "Setoran Lancar!" : manual && read < R.seq.length ? "Setoran Dihentikan" : "Setoran Selesai";
+  $("rmSub").textContent = `${read} dari ${R.seq.length} kata dibaca`;
+  ["ok","fixed","bad","skip","help"].forEach(k => { $("rm" + k[0].toUpperCase() + k.slice(1)).textContent = n[k]; });
+  const list = $("rmList"); list.innerHTML = "";
+  if (problems.length) {
+    list.innerHTML = `<div class="lbl">Ayat yang perlu diulang (ketuk untuk latihan susun kata):</div>`;
+    problems.forEach(i => {
+      const it = S.items[i];
+      const b = document.createElement("button");
+      b.textContent = `${metaOf(it.s)[1]} ${it.a}`;
+      b.onclick = () => { exitRecite(true); S.idx = i; setupAyah(); };
+      list.appendChild(b);
+    });
+  }
+  $("reciteModal").classList.remove("hidden");
+}
+
+$("reciteBtn").onclick = enterRecite;
+$("micBtn").onclick = () => {
+  if (R.listening || R.wantListen) { stopListening(); setReciteStatus("Dijeda. Tekan 🎙 untuk melanjutkan."); }
+  else startListening();
+};
+$("rcHelp").onclick = reciteHelp;
+$("rcDone").onclick = () => finishRecite(true);
+$("rcExit").onclick = () => exitRecite(false);
+$("stopSeg").onclick = e => { const v = e.target.dataset.stop; if (v === undefined) return; R.stopMode = v === "1"; savePrefs(); updateRecitePanel(); };
+$("rmAgain").onclick = () => { $("reciteModal").classList.add("hidden"); enterRecite(); };
+$("rmClose").onclick = () => exitRecite(false);
 
 /* ====== MULAI ====== */
 const prefs = store.get("prefs", {});
